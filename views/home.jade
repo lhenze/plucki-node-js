@@ -1,0 +1,20 @@
+extends layout
+block navigation
+	ul.nav
+		li#iprefer
+			a(href='/i/#{thisID}') #{pluckername}
+		- each name in pollotherusers
+			li#our
+				a(href='/u/#{name}') #{name}
+		li#everyone
+				a(href='/all') Everyone
+
+block content
+	ul.itemlist
+		- each val, key in pluckeritems
+			li.swatch
+				h6= val.name
+				.score-readout= val.score
+				.green(data-url = "#{val.url}", data-score = "#{val.score}")
+	button.saveButton save my plucks and add to the mix
+	.id(data-id = "#{thisID}")

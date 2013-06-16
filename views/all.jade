@@ -1,0 +1,19 @@
+extends layout
+block navigation
+	ul.nav
+		li#iprefer
+			a(href='/i/#{thisID}') #{pluckername}
+		- each name in pollotherusers
+			li#our
+				a(href='/u/#{name}') #{name}
+		li#everyone
+				a(href='/all') Everyone
+block content
+	h1.pageTitle The average of all participants' input:	
+	ul.itemlist
+		- each val, key in pollitems
+			li.swatch
+				h6= val.name
+				.score-readout= val.score
+				.green(data-url = "#{val.url}", data-score = "#{val.score}")
+	

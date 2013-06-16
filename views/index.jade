@@ -1,0 +1,7 @@
+extends layout
+block content
+	div.wrap 
+		form(method="post", action="/addNew")
+			input(type="text", placeholder="What shall we call you?", name="name")
+			input(type="submit", value="add me") 
+		
