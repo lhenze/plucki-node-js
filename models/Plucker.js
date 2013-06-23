@@ -4,10 +4,8 @@ var mongoose = require('mongoose'),
 var PluckerSchema = Schema({
   name: String,
   username: String,
-  // poll_id: Schema.Types.ObjectId,
   poll_id: { type: Schema.Types.ObjectId, ref: 'Poll' },
   items: Schema.Types.Mixed
-
 });
 
 module.exports = PluckerSchema;

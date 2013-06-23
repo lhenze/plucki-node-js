@@ -53,15 +53,15 @@ module.exports.create = function(app) {
     var thisName, thisUsersItems;
     var thisPollID, thisPollName, thisPollAllUsers;
 
-    db.Plucker.findById(thisID, function(err, tp) {
+    db.Plucker.findById(thisID, function(err, thisPerson) {
       if (err) {
         console.log("Cannot find this User by id: " + err);
         return next(err);
       }
-      thisName = tp.username;
+      thisName = thisPerson.username;
       req.session.thisName = thisName;
-      thisUsersItems = tp.items;
-      thisPollID = req.session.thisPollID = tp.poll_id;
+      thisUsersItems = thisPerson.items;
+      thisPollID = req.session.thisPollID = thisPerson.poll_id;
       db.Poll.findById(thisPollID).populate('users', 'username').exec(function(err, thispoll) {
         if (err) {
           console.log(err);
@@ -72,22 +72,24 @@ module.exports.create = function(app) {
         //thisPollID = thispoll.id;
         req.session.pollitems = thispoll.items;
         // when displaying the page, show all items, even if this user doesn't have a value for that one yet. 
-        for (var i = 0; i < thispoll.items.length; i++) {
+            console.log("thisPerson " + thisPerson);
+
+            for (var i = 0; i < thispoll.items.length; i++) {
           // find the object in this user's list that correlates to the larger list
-          var x = arrayIndexOf(tp.items, function(obj) {
+          var x = arrayIndexOf(thisPerson.items, function(obj) {
             return obj.url == thispoll.items[i].url;
           });
           if (-1 == x) {
             console.log("didn't find " + thispoll.items[i].url + " in " + thisName + 's items');
-            tp.items.push({
+            thisPerson.items.push({
               url: thispoll.items[i].url,
               name: thispoll.items[i].name,
               score: '50'
             });
           }
         }
-        console.log("tp " + tp);
-        tp.save();
+    
+        thisPerson.save();
         //  get a list of users' names, excluding this one, for the navigation. 
         var otherUsersNamesArray = [];
         for (var t = 0; t < thispoll.users.length; t++) {
@@ -215,7 +217,7 @@ module.exports.create = function(app) {
       if (!user) {
         user = new db.Plucker();
         user.username = postedname;
-        user.items = req.session.pollitems;
+        user.items = [];
         // this is hard-coded for now.  shall not always be
         user.poll_id = "51ad319e14f73292f600000c";
         user.save(function(err, newUser) {

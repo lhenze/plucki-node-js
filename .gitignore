@@ -12,6 +12,7 @@ logs
 results
 
 npm-debug.log
+<<<<<<< HEAD
 node_modules
 
 conf.js
@@ -54,3 +55,5 @@ conf.js
 Icon?
 ehthumbs.db
 Thumbs.db
+=======
+>>>>>>> 8917626951d4ef696a81b515a9c19b8b13bf7303
