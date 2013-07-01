@@ -1,6 +1,6 @@
 var db = require('../models'),
-  conf = require('../conf'),
-  plucki = {};
+  conf = require('../conf');
+var __ = require('underscore');
 
 // http://blog.webonweboff.com/2010/05/javascript-search-array-of-objects.html
 
@@ -47,7 +47,7 @@ module.exports.create = function(app) {
   });
   app.get('/i/:id', function(req, res, next) {
     //req.session.destroy();
-
+    console.log("underscore " + __.uniq([6, 5, 3, 5, 5, 3, 1]));
     var thisID = req.params.id;
     req.session.thisID = thisID;
     var thisName, thisUsersItems;
@@ -67,20 +67,20 @@ module.exports.create = function(app) {
           console.log(err);
           return next(err);
         }
-        thisPollName = thispoll.pollname;
-        req.session.thisPollName = thisPollName;
+        req.session.thisPollName = thisPollName = thispoll.pollname;
         //thisPollID = thispoll.id;
         req.session.pollitems = thispoll.items;
         // when displaying the page, show all items, even if this user doesn't have a value for that one yet. 
-            console.log("thisPerson " + thisPerson);
+        console.log("thisPerson " + thisPerson);
 
-            for (var i = 0; i < thispoll.items.length; i++) {
+        for (var i = 0; i < thispoll.items.length; i++) {
           // find the object in this user's list that correlates to the larger list
+          // investigate process.nextTick(cb);
           var x = arrayIndexOf(thisPerson.items, function(obj) {
             return obj.url == thispoll.items[i].url;
           });
           if (-1 == x) {
-            console.log("didn't find " + thispoll.items[i].url + " in " + thisName + 's items');
+            //console.log("didn't find " + thispoll.items[i].url + " in " + thisName + 's items');
             thisPerson.items.push({
               url: thispoll.items[i].url,
               name: thispoll.items[i].name,
@@ -88,17 +88,16 @@ module.exports.create = function(app) {
             });
           }
         }
-    
+
         thisPerson.save();
         //  get a list of users' names, excluding this one, for the navigation. 
         var otherUsersNamesArray = [];
         for (var t = 0; t < thispoll.users.length; t++) {
           //console.log(t + " ##  " + thispoll.users[t].username);
           // mongoose populate 
-          if (thispoll.users[t].username != thisName) {
-            otherUsersNamesArray.push(thispoll.users[t].username);
-          }
+          otherUsersNamesArray.push(thispoll.users[t].username);
         }
+
         req.session.otherUsersNamesArray = otherUsersNamesArray;
         res.render('home', {
           thisID: thisID,
@@ -147,16 +146,15 @@ module.exports.create = function(app) {
       if (err) {
         console.log("the err is " + err);
       } else {
-        console.log("the adventure is found ");
         // help!  There must be a better way to do this. 
+        var newUnionArray = __.union(adventure.items, req.session.pollitems);
         for (var i = 0; i < req.session.pollitems.length; i++) {
-
           // find the object in this user's list that correlates to the larger list
           var x = arrayIndexOf(adventure.items, function(obj) {
             return obj.url == req.session.pollitems[i].url;
           });
           if (-1 == x) {
-            console.log("didn't find." + req.session.pollitems[i].url);
+            //console.log("didn't find." + req.session.pollitems[i].url);
             adventure.items.push({
               url: req.session.pollitems[i].url,
               score: req.session.pollitems[i].score,
