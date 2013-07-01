@@ -33,7 +33,6 @@ module.exports.create = function(app) {
       if (err) {
         console.log(err);
       } else {
-        //console.log("this is my callback " + x.items );
         res.render('all', {
           thisID: req.session.thisID,
           pluckername: req.session.thisName,
@@ -58,8 +57,7 @@ module.exports.create = function(app) {
         console.log("Cannot find this User by id: " + err);
         return next(err);
       }
-      thisName = thisPerson.username;
-      req.session.thisName = thisName;
+      req.session.thisName = thisName = thisPerson.username;
       thisUsersItems = thisPerson.items;
       thisPollID = req.session.thisPollID = thisPerson.poll_id;
       db.Poll.findById(thisPollID).populate('users', 'username').exec(function(err, thispoll) {
@@ -84,20 +82,18 @@ module.exports.create = function(app) {
             thisPerson.items.push({
               url: thispoll.items[i].url,
               name: thispoll.items[i].name,
-              score: '50'
+              score: '12'
             });
           }
         }
-
         thisPerson.save();
         //  get a list of users' names, excluding this one, for the navigation. 
         var otherUsersNamesArray = [];
         for (var t = 0; t < thispoll.users.length; t++) {
-          //console.log(t + " ##  " + thispoll.users[t].username);
-          // mongoose populate 
-          otherUsersNamesArray.push(thispoll.users[t].username);
+          if (thispoll.users[t].username != thisName) {
+            otherUsersNamesArray.push(thispoll.users[t].username);
+          }
         }
-
         req.session.otherUsersNamesArray = otherUsersNamesArray;
         res.render('home', {
           thisID: thisID,
@@ -194,7 +190,7 @@ module.exports.create = function(app) {
       if (err || !saved) {
         console.log("Post not updated: " + err);
       } else {
-        console.log("Post updated: %s", saved);
+        //console.log("Post updated: %s", saved);
         res.send("this was saved!");
       }
     });
@@ -215,26 +211,31 @@ module.exports.create = function(app) {
       if (!user) {
         user = new db.Plucker();
         user.username = postedname;
-        user.items = [];
         // this is hard-coded for now.  shall not always be
         user.poll_id = "51ad319e14f73292f600000c";
-        user.save(function(err, newUser) {
-          if (err) {
-            console.log(err);
-            return next(err);
+        db.Poll.findById(user.poll_id, function(err, thisP) {
+          user.items = thisP.items;
+          for (j = 0; j < user.items.length; j++) {
+            user.items[j].score = 12;
           }
-          // add to the "users" array in the poll
-          db.Poll.update({
-            _id: user.poll_id
-          }, {
-            $addToSet: {
-              users: user
+          // for(index in object) { var attr = object[index]; }
+          user.save(function(err, newUser) {
+            if (err) {
+              console.log(err);
+              return next(err);
             }
-          }, function(err, pastrami) {
-            console.log("pastrami is saved: " + pastrami);
-            res.redirect("/i/" + newUser.id);
+            // add to the "users" array in the poll
+            db.Poll.update({
+              _id: user.poll_id
+            }, {
+              $addToSet: {
+                users: user
+              }
+            }, function(err, pastrami) {
+              //console.log("pastrami is saved: " + pastrami);
+              res.redirect("/i/" + newUser.id);
+            });
           });
-
         });
       } else {
         res.redirect("/nameistaken");
