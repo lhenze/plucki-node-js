@@ -15,12 +15,12 @@ $(function() {
 				if ($("body").hasClass("home")) {
 					$(this).find(".ui-slider-range").css("background-color", "rgba(115,225,57," + alpha + ")");
 				}
-				},
-				disabled: ($('body').hasClass('home') === false)
-			});
+			},
+			disabled: ($('body').hasClass('home') === false)
 		});
+	});
 	var url = window.location.pathname,
-			urlRegExp = new RegExp(url.replace(/\/$/, '') + "$"); //  regexp to deal with possible slash
+		urlRegExp = new RegExp(url.replace(/\/$/, '') + "$"); //  regexp to deal with possible slash
 	$('.nav a').each(function() {
 		if (urlRegExp.test(this.href.replace(/\/$/, ''))) {
 			$(this).addClass('active');
@@ -30,8 +30,18 @@ $(function() {
 
 	$(".saveButton").click(function() {
 		saveMyChoices();
-	}); window.plucki = {}; window.plucki.myID = $(".id").attr('data-id');
 	});
+	$(".addNewItem").click(function() {
+		console.log("addNew");
+		$(".addNewFormHold").show(function() {
+			$(this).find(".saveNewItem").click(function() {
+				saveNewItem();
+			});
+		});
+	});
+	window.plucki = {};
+	window.plucki.myID = $(".id").attr('data-id');
+});
 
 
 function refreshMySwatch() {
@@ -44,6 +54,35 @@ function refreshMySwatch() {
 	$thisSlider.find(".ui-slider-range").css("background-color", "rgba(115,225,57," + alpha + ")");
 	$thisSlider.parent().find(".score-readout").html(thisValue);
 	$thisSlider.attr('data-score', thisValue);
+}
+
+function saveNewItem() {
+	var newItemName = $(".newitemname").val();
+	console.log("newitemname");
+	var output = JSON.stringify({
+		new: newItemName
+	});
+	var turl = "/" + window.plucki.myID + '/newitem';
+	$.ajax({
+		url: turl,
+		type: "POST",
+		processData: false,
+		contentType: 'application/json',
+		data: output,
+		complete: function() {
+			console.log('process complete');
+		},
+		success: function(data) {
+			console.log(data);
+			console.log('process success');
+			$(".savedResponseTextHolder").html("Item saved");
+			$(".savedResponseTextHolder").fadeIn(500).delay(2000).fadeOut(500);
+
+		},
+		error: function(jqXHR, textStatus, errorThrown) {
+			console.log('process error ' + jqXHR + " " + textStatus + " " + errorThrown);
+		},
+	});
 }
 
 function saveMyChoices() {
@@ -70,7 +109,6 @@ function saveMyChoices() {
 		url: turl,
 		type: "POST",
 		processData: false,
-		//dataType: "json",
 		contentType: 'application/json',
 		data: output,
 		complete: function() {

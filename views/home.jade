@@ -17,4 +17,8 @@ block content
 				.score-readout= val.score
 				.green(data-url = "#{val.url}", data-score = "#{val.score}")
 	button.saveButton save my plucks and add to the mix
+	button.addNewItem +
+	div.addNewFormHold(style="display:none")
+		input(type="text", placeholder="Type new item here", class="newitemname")
+		button.saveNewItem save
 	.id(data-id = "#{thisID}")

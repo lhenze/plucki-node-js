@@ -14,7 +14,25 @@ function arrayIndexOf(a, fnc) {
   }
   return -1;
 }
+//http://dense13.com/blog/2009/05/03/converting-string-to-slug-javascript/
 
+function string_to_slug(str) {
+  str = str.replace(/^\s+|\s+$/g, ''); // trim
+  str = str.toLowerCase();
+
+  // remove accents, swap ñ for n, etc
+  var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
+  var to = "aaaaeeeeiiiioooouuuunc------";
+  for (var i = 0, l = from.length; i < l; i++) {
+    str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
+  }
+
+  str = str.replace(/[^a-z0-9 -]/g, '') // remove invalid chars
+  .replace(/\s+/g, '-') // collapse whitespace and replace by -
+  .replace(/-+/g, '-'); // collapse dashes
+
+  return str;
+}
 module.exports.create = function(app) {
 
   app.get('/', function(req, res, next) {
@@ -46,7 +64,7 @@ module.exports.create = function(app) {
   });
   app.get('/i/:id', function(req, res, next) {
     //req.session.destroy();
-    console.log("underscore " + __.uniq([6, 5, 3, 5, 5, 3, 1]));
+    //console.log("underscore " + __.uniq([6, 5, 3, 5, 5, 3, 1]));
     var thisID = req.params.id;
     req.session.thisID = thisID;
     var thisName, thisUsersItems;
@@ -192,6 +210,48 @@ module.exports.create = function(app) {
       } else {
         //console.log("Post updated: %s", saved);
         res.send("this was saved!");
+      }
+    });
+  });
+  // Add a new item
+  app.post('/:id/newitem', function(req, res, next) {
+    // this route is  accessed via ajax
+    var thisID = req.params.id;
+    // when the request was sent as JSON, there is no req.body.data
+    // here, req.body comes in as a plain object
+    var newItemName = req.body.new;
+    var item = new db.Item();
+
+    item.name = newItemName;
+    item.score = 0;
+    item.url = string_to_slug(newItemName);
+
+    db.Plucker.update({
+      _id: thisID
+    }, {
+      //The $addToSet operator adds a value to an array only if the value is not in the array already
+      $addToSet: {
+        items: item
+      }
+    }, function(err, saved) {
+      if (err || !saved) {
+        console.log("Post not updated: " + err);
+      } else {
+        console.log("poll " + req.session.thisPollID);
+        db.Poll.update({
+          _id: req.session.thisPollID
+        }, {
+          //The $addToSet operator adds a value to an array only if the value is not in the array already
+          $addToSet: {
+            items: item
+          }
+        }, function(err, saved) {
+          if (err || !saved) {
+            console.log("Post not updated: " + err);
+          } else {
+            res.send("this was saved!");
+          }
+        });
       }
     });
   });
