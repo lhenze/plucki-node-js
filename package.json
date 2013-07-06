@@ -1,6 +1,6 @@
 {
   "name": "plucki ",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "private": true,
   "scripts": {
     "start": "node app"
@@ -8,7 +8,6 @@
   "dependencies": {
     "express": "3.0.5",
     "jade": "*",
-    "instagram-node": "~0.1.9",
     "mongoose": "~3.5.4",
     "connect-mongo": "~0.3.2",
      "underscore": "1.4.4"
