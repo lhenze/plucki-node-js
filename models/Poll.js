@@ -39,13 +39,13 @@ PollSchema.statics.averageResults = function(id, callback) {
 				var avg = 0;
 				for (var r = 0; r < thisPoll.users.length; r++) {
 					
-					console.log(" -- >> This user: " + thisPoll.users[r].items[i].score);
+					console.log(" -- >> This user: " + parseInt(thisPoll.users[r].items[i].score);
 					// warning! Be careful - this will only work if the items appear in the same order
 					// This should be fixed to reference by items' urls
 					//if ((!isNaN(thisPoll.users[r].items[i].score))) {
 					//	sum += parseInt(thisPoll.users[r].items[i].score, 10);
 					//}
-					sum += thisPoll.users[r].items[i].score;
+					sum += parseInt(thisPoll.users[r].items[i].score);
 				}
 				avg = parseInt(sum / thisPoll.users.length, 10);
 				thisPoll.items[i].score = avg;
