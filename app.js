@@ -1,41 +1,38 @@
   var express = require('express'),
- 	routes = require('./routes'),
- 	http = require('http'),
- 	path = require('path'),
- 	// set configuration options in heroku
- 	//dbUrl = require('./conf').mongo_uri
- 	;
+	routes = require('./routes'),
+	http = require('http'),
+	path = require('path');
 
 
-var mongo = require('mongodb');
+  var mongo = require('mongodb');
+   // configuration options set in heroku
+  var dbUrl = process.env.MONGOLAB_URI ||
+	process.env.MONGOHQ_URL ||
+	'mongodb://localhost/mydb';
 
-var dbUrl = process.env.MONGOLAB_URI || 
-  process.env.MONGOHQ_URL || 
-  'mongodb://localhost/mydb'; 
 
+  var MongoStore = require('connect-mongo')(express);
+  var app = express();
+  app.set('port', process.env.PORT || 3000);
 
- var MongoStore = require('connect-mongo')(express);
- var app = express();
- app.set('port', process.env.PORT || 3000);
+  app.set('views', __dirname + '/views');
+  app.set('view engine', 'jade');
+  app.use(express.favicon());
+  app.use(express.logger('dev'));
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
+  app.use(express.cookieParser('your secret here'));
+  app.use(express.session({
+	secret: 'node rocks',
+	store: new MongoStore({
+		db: 'Esmerelda',
+		url: dbUrl
+	})
+  }));
+  app.use(app.router);
+  app.use(express.static(path.join(__dirname, 'public')));
+  routes.create(app);
 
- app.set('views', __dirname + '/views');
- app.set('view engine', 'jade');
- app.use(express.favicon());
- app.use(express.logger('dev'));
- app.use(express.bodyParser());
- app.use(express.methodOverride());
- app.use(express.cookieParser('your secret here'));
- app.use(express.session({
- 	secret: 'node rocks',
- 	store: new MongoStore({
- 		db: 'Esmerelda',
- 		url: dbUrl
- 	})
- }));
- app.use(app.router);
- app.use(express.static(path.join(__dirname, 'public')));
- routes.create(app);
-
- http.createServer(app).listen(app.get('port'), function() {
- 	console.log('Express server listening on port ' + app.get('port'));
- });
+  http.createServer(app).listen(app.get('port'), function() {
+	console.log('Express server listening on port ' + app.get('port'));
+  });
