@@ -3,8 +3,6 @@
 	http = require('http'),
 	path = require('path');
 
-
-  var mongo = require('mongodb');
    // configuration options set in heroku
   var dbUrl = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/mydb';
 
