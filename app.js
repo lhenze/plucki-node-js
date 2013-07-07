@@ -6,9 +6,7 @@
 
   var mongo = require('mongodb');
    // configuration options set in heroku
-  var dbUrl = process.env.MONGOLAB_URI ||
-	process.env.MONGOHQ_URL ||
-	'mongodb://localhost/mydb';
+  var dbUrl = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/mydb';
 
 
   var MongoStore = require('connect-mongo')(express);

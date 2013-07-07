@@ -1,9 +1,7 @@
-var db = require('../models'),
-  conf = require('../conf');
+var db = require('../models');
 var __ = require('underscore');
 
 // http://blog.webonweboff.com/2010/05/javascript-search-array-of-objects.html
-
 function arrayIndexOf(a, fnc) {
   if (!fnc || typeof(fnc) != 'function') {
     return -1;

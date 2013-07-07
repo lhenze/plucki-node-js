@@ -1,11 +1,10 @@
 var mongoose = require('mongoose'),
     PluckerSchema = require('./Plucker'),
-    PollSchema = require('./Poll'),
-    conf = require('../conf');
+    PollSchema = require('./Poll');
 
 // connect
 
-var uri = conf.mongo_uri;
+var uri = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || conf.mongo_uri;
 
 mongoose.connect(uri);
 
