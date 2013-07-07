@@ -47,7 +47,8 @@ module.exports.create = function(app) {
     req.session.pollID = "51ad319e14f73292f600000c";
     db.Poll.averageResults(req.session.pollID, function(err, savedpoll) {
       if (err) {
-        console.log(err);
+        console.log("oh dear, there's an error at " + err);
+
       } else {
         res.render('all', {
           thisID: req.session.thisID,

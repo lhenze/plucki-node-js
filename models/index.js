@@ -4,7 +4,7 @@ var mongoose = require('mongoose'),
 
 // connect
 
-var uri = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || conf.mongo_uri;
+var uri = process.env.MONGOLAB_URI || process.env.MONGOHQ_URL;
 
 mongoose.connect(uri);
 
