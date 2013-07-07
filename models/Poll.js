@@ -34,18 +34,18 @@ PollSchema.statics.averageResults = function(id, callback) {
 
 			thisPoll.users = newCleanArray;
 			for (var i = 0; i < thisPoll.items.length; i++) {
-				console.log(thisPoll.items[i].name + " avg so far: " + thisPoll.items[i].score );
+				console.log(thisPoll.items[i].name + " avg so far: " + thisPoll.items[i].score);
 				var sum = 0;
 				var avg = 0;
 				for (var r = 0; r < thisPoll.users.length; r++) {
-					
-					console.log(" -- >> This user: " + parseInt(thisPoll.users[r].items[i].score);
+
+					console.log(" -- >> This user: " + parseInt(thisPoll.users[r].items[i].score, 10));
 					// warning! Be careful - this will only work if the items appear in the same order
 					// This should be fixed to reference by items' urls
 					//if ((!isNaN(thisPoll.users[r].items[i].score))) {
 					//	sum += parseInt(thisPoll.users[r].items[i].score, 10);
 					//}
-					sum += parseInt(thisPoll.users[r].items[i].score);
+					sum += parseInt(thisPoll.users[r].items[i].score, 10);
 				}
 				avg = parseInt(sum / thisPoll.users.length, 10);
 				thisPoll.items[i].score = avg;
