@@ -2,7 +2,17 @@
  	routes = require('./routes'),
  	http = require('http'),
  	path = require('path'),
- 	dbUrl = require('./conf').mongo_uri;
+ 	// set configuration options in heroku
+ 	//dbUrl = require('./conf').mongo_uri
+ 	;
+
+
+var mongo = require('mongodb');
+
+var dbUrl = process.env.MONGOLAB_URI || 
+  process.env.MONGOHQ_URL || 
+  'mongodb://localhost/mydb'; 
+
 
  var MongoStore = require('connect-mongo')(express);
  var app = express();
