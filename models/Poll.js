@@ -42,7 +42,7 @@ PollSchema.statics.averageResults = function(id, callback) {
 					console.log(" -- >> 2nd loop " + thisPoll.users[r].items[i].score);
 					// warning! Be careful - this will only work if the items appear in the same order
 					// This should be fixed to reference by items' urls
-					if (thisPoll.users[r].items[i].score && (!isNAN(thisPoll.users[r].items[i].score))) {
+					if ((!isNaN(thisPoll.users[r].items[i].score))) {
 						sum += parseInt(thisPoll.users[r].items[i].score, 10);
 					}
 				}
