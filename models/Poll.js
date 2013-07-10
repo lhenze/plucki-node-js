@@ -31,15 +31,15 @@ PollSchema.statics.averageResults = function(id, callback) {
 				// return true if it the user and its items are all defined
 				return (!((typeof userObj === 'undefined') || (typeof userObj.items === 'undefined') || (userObj.items.length === 0)));
 			});
-			console.log(" 1 -- >> thisPoll.users: " +  Array.isArray(thisPoll.users)  + thisPoll.users.length );
+			console.log(" 1 -- >> thisPoll.users: " + Array.isArray(thisPoll.users) + thisPoll.users.length);
 			thisPoll.users = newCleanArray;
-		console.log(" 2 -- >> thisPoll.users: " +  Array.isArray(thisPoll.users)  + thisPoll.users.length );
+			console.log(" 2 -- >> thisPoll.users: " + Array.isArray(thisPoll.users) + thisPoll.users.length);
 			for (var i = 0; i < thisPoll.items.length; i++) {
 				console.log(thisPoll.items[i].name + " avg so far: " + thisPoll.items[i].score);
 				var sum = 0;
 				var avg = 0;
 				for (var r = 0; r < thisPoll.users.length; r++) {
-
+					console.log(" 3 -- >> thisPoll.users: " + Array.isArray(thisPoll.users) + thisPoll.users.length);
 					//console.log(" -- >> This user: " + parseInt(thisPoll.users[r].items[i].score, 10));
 					// warning! Be careful - this will only work if the items appear in the same order
 					// This should be fixed to reference by items' urls
