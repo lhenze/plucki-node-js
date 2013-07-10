@@ -23,7 +23,7 @@ function string_to_slug(str) {
 module.exports.create = function(app) {
 
   app.get('/', function(req, res, next) {
-    req.session.destroy();
+    //req.session.destroy();
     req.session.pollID = "51ad319e14f73292f600000c";
     res.render('index', {
       title: "Complexity rocks. ",
