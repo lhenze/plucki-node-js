@@ -1,17 +1,6 @@
 var db = require('../models');
 var __ = require('underscore');
 
-// http://blog.webonweboff.com/2010/05/javascript-search-array-of-objects.html
-function arrayIndexOf(a, fnc) {
-  if (!fnc || typeof(fnc) != 'function') {
-    return -1;
-  }
-  if (!a || !a.length || a.length < 1) return -1;
-  for (var i = 0; i < a.length; i++) {
-    if (fnc(a[i])) return i;
-  }
-  return -1;
-}
 //http://dense13.com/blog/2009/05/03/converting-string-to-slug-javascript/
 
 function string_to_slug(str) {
@@ -77,38 +66,37 @@ module.exports.create = function(app) {
       req.session.thisName = thisName = thisPerson.username;
       thisUsersItems = thisPerson.items;
       thisPollID = req.session.thisPollID = thisPerson.poll_id;
-      db.Poll.findById(thisPollID).populate('users', 'username').exec(function(err, thispoll) {
+      db.Poll.findById(thisPollID).populate('users', 'username').exec(function(err, thisPoll) {
         if (err) {
           console.log(err);
           return next(err);
         }
-        req.session.thisPollName = thisPollName = thispoll.pollname;
-        //thisPollID = thispoll.id;
-        req.session.pollitems = thispoll.items;
+        req.session.thisPollName = thisPollName = thisPoll.pollname;
+        //thisPollID = thisPoll.id;
+        req.session.pollitems = thisPoll.items;
         // when displaying the page, show all items, even if this user doesn't have a value for that one yet. 
-        console.log("thisPerson " + thisPerson);
-
-        for (var i = 0; i < thispoll.items.length; i++) {
+        for (var i = 0; i < thisPoll.items.length; i++) {
           // find the object in this user's list that correlates to the larger list
-          // investigate process.nextTick(cb);
-          var x = arrayIndexOf(thisPerson.items, function(obj) {
-            return obj.url == thispoll.items[i].url;
-          });
-          if (-1 == x) {
-            //console.log("didn't find " + thispoll.items[i].url + " in " + thisName + 's items');
-            thisPerson.items.push({
-              url: thispoll.items[i].url,
-              name: thispoll.items[i].name,
-              score: '12'
+          for (var r = 0; r < thisPerson.items.length; r++) {
+            var q = __.findWhere(thisPerson.items, {
+              url: thisPoll.items[i].url
             });
+            if (!q) {
+              //console.log("didn't find " + thisPoll.items[i].url + " in " + thisName + 's items');
+              thisPerson.items.push({
+                url: thisPoll.items[i].url,
+                name: thisPoll.items[i].name,
+                score: '12'
+              });
+            }
           }
+          thisPerson.save();
         }
-        thisPerson.save();
         //  get a list of users' names, excluding this one, for the navigation. 
         var otherUsersNamesArray = [];
-        for (var t = 0; t < thispoll.users.length; t++) {
-          if (thispoll.users[t].username != thisName) {
-            otherUsersNamesArray.push(thispoll.users[t].username);
+        for (var t = 0; t < thisPoll.users.length; t++) {
+          if (thisPoll.users[t].username != thisName) {
+            otherUsersNamesArray.push(thisPoll.users[t].username);
           }
         }
         req.session.otherUsersNamesArray = otherUsersNamesArray;
@@ -117,7 +105,7 @@ module.exports.create = function(app) {
           pluckername: thisName,
           pluckeritems: thisUsersItems,
           pollname: thisPollName,
-          pollitems: thispoll.items,
+          pollitems: thisPoll.items,
           pollotherusers: otherUsersNamesArray,
           bodyclass: 'home'
         });
@@ -155,35 +143,37 @@ module.exports.create = function(app) {
     console.log("hello: " + uname);
     db.Plucker.findOne({
       username: uname
-    }, function(err, adventure) {
+    }, function(err, thisPerson) {
       if (err) {
         console.log("the err is " + err);
       } else {
-        // help!  There must be a better way to do this. 
-        var newUnionArray = __.union(adventure.items, req.session.pollitems);
+        ////
+
+        ////
         for (var i = 0; i < req.session.pollitems.length; i++) {
           // find the object in this user's list that correlates to the larger list
-          var x = arrayIndexOf(adventure.items, function(obj) {
-            return obj.url == req.session.pollitems[i].url;
-          });
-          if (-1 == x) {
-            //console.log("didn't find." + req.session.pollitems[i].url);
-            adventure.items.push({
-              url: req.session.pollitems[i].url,
-              score: req.session.pollitems[i].score,
-              name: req.session.pollitems[i].name
+          for (var r = 0; r < thisPerson.items.length; r++) {
+            var q = __.findWhere(thisPerson.items, {
+              url: req.session.pollitems[i].url
             });
-            // console.log(adventure.items);
+            if (!q) {
+              //console.log("didn't find " + thisPoll.items[i].url + " in " + thisName + 's items');
+              thisPerson.items.push({
+                url: req.session.pollitems[i].url,
+                score: req.session.pollitems[i].score,
+                name: req.session.pollitems[i].name
+              });
+            }
           }
         }
-        adventure.save(function(err, giraffe) {
+        thisPerson.save(function(err, giraffe) {
           if (err) {
             console.log("the err is " + err);
           } else {
             console.log("saved! about to render a " + giraffe);
             res.render('otheruser', {
               thisID: req.session.thisID,
-              uID: adventure.id,
+              uID: thisPerson.id,
               uname: uname,
               pluckername: req.session.thisName,
               pollname: req.session.thisPollName,
@@ -193,6 +183,8 @@ module.exports.create = function(app) {
             });
           }
         });
+
+
       } // end if 
     });
   });

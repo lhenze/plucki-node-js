@@ -9,7 +9,6 @@ var itemSchema = Schema({
 		default: null
 	}
 });
-
 var PollSchema = Schema({
 	pollname: String,
 	items: [itemSchema],
@@ -19,38 +18,28 @@ var PollSchema = Schema({
 		}
 	]
 });
-
-//AvForJustOneItem(0, itemArray);
 PollSchema.statics.averageResults = function(id, callback) {
 	this.findById(id).populate('users', 'items').exec(function(err, thisPoll) {
-
 		if (err) {
 			console.log("static: " + err);
 			//return next(err);
 		} else {
 			console.log("this poll" + thisPoll);
-			// underscore.js -- using the filter method to create a new array, without refs to broken users
-			//var newCleanArray = __.filter(thisPoll.users, function(userObj) {
-			// return true if it the user and its items are all defined
-			//return (!((typeof userObj === 'undefined') || (typeof userObj.items === 'undefined') || (userObj.items.length === 0)));
-			//});
-			//console.log(" 1 -- >> thisPoll.users: " + Array.isArray(thisPoll.users) + thisPoll.users.length);
-			//thisPoll.users = newCleanArray;
-			//console.log(" 2 -- >> thisPoll.users: " + Array.isArray(thisPoll.users) + thisPoll.users.length);
-
-			//Model.AvForJustOneItem(0, thisPoll.items.length, thisPoll.items[0]);
 			for (var i = 0; i < thisPoll.items.length; i++) {
-				console.log(thisPoll.items[i].url + " avg so far: " + thisPoll.items[i].score);
+				// for each of the poll's items, loop through each of its users, locate that item, and average the scores
 				var sum = 0;
+				var peeps = 0;
 				for (var r = 0; r < thisPoll.users.length; r++) {
 					// underscore.js to the rescue
 					var q = __.findWhere(thisPoll.users[r].items, {
 						url: thisPoll.items[i].url
 					});
-
-					sum += q.score;
-				}
-				var avg = parseInt(sum / thisPoll.users.length, 10);
+					if (q) {
+						sum += q.score;
+						peeps++;
+					}
+				}	
+				var avg = parseInt(sum / peeps, 10);
 				thisPoll.items[i].score = avg;
 			}
 			thisPoll.save(callback);
