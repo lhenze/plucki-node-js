@@ -8,8 +8,7 @@ function string_to_slug(str) {
   str = str.toLowerCase();
 
   // remove accents, swap ñ for n, etc
-  var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;";
-  var to = "aaaaeeeeiiiioooouuuunc------";
+  var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;", to = "aaaaeeeeiiiioooouuuunc------";
   for (var i = 0, l = from.length; i < l; i++) {
     str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
   }
@@ -210,12 +209,13 @@ module.exports.create = function(app) {
     // when the request was sent as JSON, there is no req.body.data
     // here, req.body comes in as a plain object
     var newItemName = req.body.new;
-    var item = new db.Item();
-
+    console.log("1 newItemName " + newItemName );
+    var item = {};
+ 
     item.name = newItemName;
     item.score = 0;
     item.url = string_to_slug(newItemName);
-
+    console.log("newItemName " + newItemName + item.url);
     db.Plucker.update({
       _id: thisID
     }, {
@@ -227,11 +227,10 @@ module.exports.create = function(app) {
       if (err || !saved) {
         console.log("Post not updated: " + err);
       } else {
-        console.log("poll " + req.session.thisPollID);
+        console.log("added new item to poll " + req.session.thisPollID);
         db.Poll.update({
           _id: req.session.thisPollID
         }, {
-          //The $addToSet operator adds a value to an array only if the value is not in the array already
           $addToSet: {
             items: item
           }
@@ -265,7 +264,7 @@ module.exports.create = function(app) {
         user.poll_id = "51ad319e14f73292f600000c";
         db.Poll.findById(user.poll_id, function(err, thisP) {
           user.items = thisP.items;
-          for (j = 0; j < user.items.length; j++) {
+          for (var j = 0; j < user.items.length; j++) {
             user.items[j].score = 12;
           }
           // for(index in object) { var attr = object[index]; }
