@@ -35,7 +35,7 @@ $(function() {
 		console.log("addNew");
 		$(".addNewFormHold").show(function() {
 			$(this).find(".saveNewItem").click(function() {
-				saveNewItem();
+				//saveNewItem();
 			});
 		});
 	});
@@ -76,6 +76,7 @@ function saveNewItem() {
 			console.log(data);
 			console.log('process success');
 			$(".savedResponseTextHolder").html("Item saved");
+			window.location = "/" + window.plucki.myID ;
 			$(".savedResponseTextHolder").fadeIn(500).delay(2000).fadeOut(500);
 
 		},
@@ -118,7 +119,7 @@ function saveMyChoices() {
 		success: function(data) {
 			console.log(data);
 			console.log('process success');
-			$(".savedResponseTextHolder").html("Item saved");
+			$(".savedResponseTextHolder").html("Changes saved");
 			$(".savedResponseTextHolder").fadeIn(500).delay(2000).fadeOut(500);
 
 		},

@@ -8,7 +8,8 @@ function string_to_slug(str) {
   str = str.toLowerCase();
 
   // remove accents, swap ñ for n, etc
-  var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;", to = "aaaaeeeeiiiioooouuuunc------";
+  var from = "àáäâèéëêìíïîòóöôùúüûñç·/_,:;",
+    to = "aaaaeeeeiiiioooouuuunc------";
   for (var i = 0, l = from.length; i < l; i++) {
     str = str.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
   }
@@ -209,9 +210,9 @@ module.exports.create = function(app) {
     // when the request was sent as JSON, there is no req.body.data
     // here, req.body comes in as a plain object
     var newItemName = req.body.new;
-    console.log("1 newItemName " + newItemName );
+    console.log("1 newItemName " + newItemName);
     var item = {};
- 
+
     item.name = newItemName;
     item.score = 0;
     item.url = string_to_slug(newItemName);
@@ -245,7 +246,47 @@ module.exports.create = function(app) {
     });
   });
   ///
-  ///
+  app.post('/addNewItem', function(req, res, next) {
+    var thisID = req.body.idFromHiddenForm;
+    var newItemName = req.body.newItemName;
+    console.log("1 newItemName " + newItemName);
+    var item = {};
+    item.name = newItemName;
+    item.score = 0;
+    item.url = string_to_slug(newItemName);
+    console.log("newItemName " + newItemName + item.url);
+    db.Plucker.update({
+      _id: thisID
+    }, {
+      //The $addToSet operator adds a value to an array only if the value is not in the array already
+      $addToSet: {
+        items: item
+      }
+    }, function(err, saved) {
+      if (err || !saved) {
+        console.log("Post not updated: " + err);
+      } else {
+        console.log("added new item to poll " + req.session.thisPollID);
+        db.Poll.update({
+          _id: req.session.thisPollID
+        }, {
+          $addToSet: {
+            items: item
+          }
+        }, function(err, saved) {
+          if (err || !saved) {
+            console.log("Post not updated: " + err);
+          } else {
+            console.log("this was saved!");
+            res.redirect("/i/" + thisID);
+          }
+        });
+      }
+    });
+    ////
+    ////
+
+  });
   ///
   app.post('/addNew', function(req, res, next) {
     var postedname = req.body.name;

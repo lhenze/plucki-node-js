@@ -19,6 +19,8 @@ block content
 	button.saveButton save my plucks and add to the mix
 	button.addNewItem +
 	div.addNewFormHold(style="display:none")
-		input(type="text", placeholder="Type new item here", class="newitemname")
-		button.saveNewItem save
+		form(method="post",action="/addNewItem/")
+			input(type="text", placeholder="Type new item here", class="newitemname", name="newItemName")
+			input(type="hidden", name="idFromHiddenForm", value="#{thisID}")
+			input.saveNewItem(type="submit") save
 	.id(data-id = "#{thisID}")
