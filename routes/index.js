@@ -114,6 +114,40 @@ module.exports.create = function(app) {
     });
     //console.log("*****  req.session. " + JSON.stringify(req.session));
   });
+  //
+  //
+  app.get('/i/:iurl/delete', function(req, res, next) {
+    var pollID = req.session.pollID;
+
+    console.log("inside delete pollID" + pollID);
+    db.Poll.update({
+      _id: req.session.pollID
+      //items.url: req.params.iurl
+    }, {
+      $pull: {
+        'items': {
+          'url': req.params.iurl
+        }
+      }
+    }, function(err, whichOne) {
+
+      if (!err) {
+        console.log(" case 1: no err ");
+        res.render('deleteItem', {
+          thisID: req.session.thisID,
+          title: "Item - deleted. ",
+          iurl: req.params.iurl,
+          bodyclass: "deleteItem"
+        });
+
+      } else {
+        console.log("YES error case 3 This is not removed from Polls users array: " + whichOne);
+      }
+    });
+  });
+  // 
+  ///
+  ///
   app.get('/u/:uname/delete', function(req, res, next) {
     db.Plucker.findOneAndRemove({
       username: req.params.uname
@@ -127,7 +161,17 @@ module.exports.create = function(app) {
           }
         }, function(err, pastrami) {
           if (!err) {
-            res.redirect("/i/" + req.session.thisID);
+            db.Plucker.remove({
+              _id: whichOne._id
+            }, function(err) {
+              if (!err) {
+                //message.type = 'notification!';
+                res.redirect("/i/" + req.session.thisID);
+              } else {
+                //message.type = 'error';f
+              }
+            });
+
           } else {
             console.log("This is not removed from Polls users array: " + pastrami);
           }
@@ -137,6 +181,8 @@ module.exports.create = function(app) {
       }
     });
   });
+
+
   app.get('/u/:uname', function(req, res, next) {
     var uname = req.params.uname;
     console.log("hello: " + uname);
@@ -156,7 +202,8 @@ module.exports.create = function(app) {
               url: req.session.pollitems[i].url
             });
             if (!q) {
-              //console.log("didn't find " + thisPoll.items[i].url + " in " + thisName + 's items');
+              //console.log("didn't find " + thisPoll.items[i].url +
+              // " in " + thisName + 's items');
               thisPerson.items.push({
                 url: req.session.pollitems[i].url,
                 score: req.session.pollitems[i].score,
@@ -287,7 +334,7 @@ module.exports.create = function(app) {
     ////
 
   });
-  ///
+  /// Add new person
   app.post('/addNew', function(req, res, next) {
     var postedname = req.body.name;
     //console.log("this postedname is " + postedname);
